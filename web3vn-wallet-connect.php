@@ -52,6 +52,9 @@ if ( ! class_exists( 'Web3vn_Wallet_Connect' ) ) :
             add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ) );
             add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
 
+            add_action( 'wp_enqueue_scripts', array( $this, 'admin_scripts' ) );
+            add_action( 'wp_enqueue_scripts', array( $this, 'admin_styles' ) );
+
             include WEB3VN_WACO_DIR . '/class-waco-admin-profile.php';
         }
 
