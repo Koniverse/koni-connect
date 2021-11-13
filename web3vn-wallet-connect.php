@@ -80,14 +80,15 @@ if ( ! class_exists( 'Web3vn_Wallet_Connect' ) ) :
             //todo: to chuc lai cho nay
 
 //            $suffix  = Constants::is_true( 'SCRIPT_DEBUG' ) ? '' : '.min';
-            wp_register_script( 'web3vn-waco-polkadot', WEB3VN_WACO_URL . '/assets/js/polkadot.js', [], WEB3VN_WACO_VERSION );
+//            wp_register_script( 'web3vn-waco-polkadot', WEB3VN_WACO_URL . '/assets/js/polkadot.js', [], WEB3VN_WACO_VERSION );
+            wp_register_script( 'web3vn-waco-util', WEB3VN_WACO_URL . '/assets/js/waco-util.js', [], WEB3VN_WACO_VERSION );
 
-            wp_enqueue_script( 'web3vn-waco-polkadot' );
             wp_enqueue_script( 'jquery' );
             wp_enqueue_script( 'bootstrap-modal', WEB3VN_WACO_URL . '/assets/libs/bootstrap/bootstrap-modal.js', [], WEB3VN_WACO_VERSION );
+            wp_enqueue_script( 'web3vn-waco-util' );
 
             wp_localize_script(
-                'web3vn-waco-polkadot',
+                'web3vn-waco-util',
                 'web3vnWacoApi',
                 array(
                     'nonce'          => wp_create_nonce( 'wp_rest' ),

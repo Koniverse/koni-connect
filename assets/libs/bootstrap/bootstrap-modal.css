@@ -152,6 +152,23 @@
     cursor: not-allowed;
 }
 
+.waco-h-hidden {
+    display: none !important;
+}
+
+.waco-m-loading-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #fff;
+    z-index: 100;
+}
+
 @media (min-width: 768px) {
     .modal-dialog {
         width: 600px;

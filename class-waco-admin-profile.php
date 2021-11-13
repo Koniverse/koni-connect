@@ -29,6 +29,36 @@ if (!class_exists('Web3vn_WaCo_Admin_Profile', false)) :
             add_action('edit_user_profile', array($this, 'add_customer_meta_fields'));
         }
 
+        public static function printSelectWalletModal() {
+            ?>
+            <div class="modal fade waco-modal" id="web3vn-waco-modal-select-wallet" tabindex="-1" aria-labelledby="modelLang"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Select your wallet</h5>
+                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"><i
+                                        class="fa fa-times" aria-hidden="true" style="font-size: 1.5rem;"></i></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="waco-m-account-wallet"></div>
+                        </div>
+                        <div class="modal-footer waco-h-hidden waco-m-footer">
+                            <div style="display: flex; justify-content: flex-end; align-items: center;">
+                                <i class="fa fa-spinner fa-spin waco-m-confirm-spinner" aria-hidden="true"
+                                   style="margin-right: 10px;
+        font-size: 18px; display: none"></i>
+                                <button type="button" class="btn btn-primary waco-btn waco-m-confirm-btn"
+                                        disabled>Confirm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php
+        }
+
         /**
          * Show Address Fields on edit user pages.
          *
@@ -44,35 +74,11 @@ if (!class_exists('Web3vn_WaCo_Admin_Profile', false)) :
             <div style="">
                 <a id="web3vn-waco-connectW"
                    style="max-width: 300px"
-                   class="btn btn-primary justify-content-between align-items-center w-100"><span>Connect Wallet</span></a>
+                   class="btn btn-primary justify-content-between align-items-center w-100 waco-h-hidden"><span>Connect Wallet</span></a>
 
             </div>
 
-            <div class="modal fade" id="web3vn-waco-modal-lg-wallet" tabindex="-1" aria-labelledby="modelLang"
-                 aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Select your wallet</h5>
-                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"><i
-                                        class="fa fa-times" aria-hidden="true" style="font-size: 1.5rem;"></i></button>
-                        </div>
-                        <div class="modal-body">
-                            <div id="web3vn-waco-account-wallet"></div>
-                        </div>
-                        <div class="modal-footer hidden" id="web3vn-waco-modal-footer">
-                            <div style="display: flex; justify-content: flex-end; align-items: center;">
-                                <i class="fa fa-spinner fa-spin" aria-hidden="true" id="web3vn-waco-confirm-spinner"
-                                   style="margin-right: 10px;
-        font-size: 18px; display: none"></i>
-                                <button type="button" class="btn btn-primary waco-btn" id="web3vn-waco-confirm-selected"
-                                        disabled>Confirm
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <?php self::printSelectWalletModal() ?>
 
             <table class="form-table hidden" id="web3vn-waco-connection-info">
                 <tr>
@@ -100,27 +106,15 @@ if (!class_exists('Web3vn_WaCo_Admin_Profile', false)) :
 
             <script>
                 (function ($) {
-                    async function selectWallet() {
-                        const extensions = await dappex.web3Enable('web3vn-waco');
+                    const polkadotScriptUrl = `<?php echo WEB3VN_WACO_URL . '/assets/js/polkadot.js?ver=' . WEB3VN_WACO_VERSION ?>`;
+                    const polkadotIconUrl = `<?php echo WEB3VN_WACO_URL . '/assets/images/polkadotjs-icon.svg' ?>`;
 
-                        if (!extensions.length) {
-                            showRequestAccess();
-                            return
-                        }
-
-                        if (!dappex.isWeb3Injected) {
-                            showPickerNone();
-                        } else {
-                            dappex.web3Accounts().then(async (accounts) => {
-                                showPicker(accounts);
-                            });
-                        }
-                    }
+                    let WalletSelectionModalHelperFunc;
 
                     function confirmSelectedWallet() {
-                        const $selected = $('input[name=select_wallet]:checked', '#web3vn-waco-account-wallet');
+                        const $selected = $('input[name=select_wallet]:checked', WalletSelectionModalHelperFunc.S_MODAL);
                         if ($selected.length) {
-                            toggleModalFooterLoading(true);
+                            WalletSelectionModalHelperFunc.toggleModalFooterLoading(true);
 
                             const name = $selected.data('name');
                             const address = $selected.val();
@@ -142,30 +136,13 @@ if (!class_exists('Web3vn_WaCo_Admin_Profile', false)) :
                                         address
                                     });
 
-                                    $('#web3vn-waco-modal-lg-wallet').modal('hide');
+                                    $(WalletSelectionModalHelperFunc.S_MODAL).modal('hide');
                                 }
                             }).always(function () {
-                                toggleModalFooterLoading(false);
+                                WalletSelectionModalHelperFunc.toggleModalFooterLoading(false);
                             });
                         } else {
                             console.log('Please select account first');
-                        }
-                    }
-
-                    function toggleModalFooter(toggle) {
-                        if (toggle) {
-                            $('#web3vn-waco-modal-footer').removeClass('hidden');
-                        } else {
-                            $('#web3vn-waco-modal-footer').addClass('hidden');
-                        }
-                    }
-
-                    function toggleModalFooterLoading(toggle) {
-                        if (toggle) {
-                            $('#web3vn-waco-confirm-selected').prop('disabled', true);
-                            $('#web3vn-waco-confirm-spinner').show();
-                        } else {
-                            $('#web3vn-waco-confirm-spinner').hide();
                         }
                     }
 
@@ -191,54 +168,25 @@ if (!class_exists('Web3vn_WaCo_Admin_Profile', false)) :
                         })
                     }
 
-                    function showRequestAccess() {
-                        $('#web3vn-waco-account-wallet').html(`
-                            <p style="margin-top: 0">Please allow this site to access polkadot{.js} extension. If you have not installed the extension, please click the button below:</p>
-                            		<a class="btn btn-primary justify-content-between align-items-center w-100" target="_blank" href="https://polkadot.js.org/extension/">Install Polkadot{.js} Extension
-                            <img style="width:32px; margin-left: 10px" src="<?php echo WEB3VN_WACO_URL . '/assets/images/polkadotjs-icon.svg' ?>">
-                            </a>`);
-                        toggleModalFooter(false);
-                        $('#web3vn-waco-modal-lg-wallet').modal('show');
-                    }
-
-                    function showPickerNone() {
-                        $('#web3vn-waco-account-wallet').html(`
-		<a class="btn btn-primary justify-content-between align-items-center w-100" target="_blank" href="https://polkadot.js.org/extension/">Install Polkadot{.js} Extension
-		<img style="width:32px; margin-left: 10px" src="<?php echo WEB3VN_WACO_URL . '/assets/images/polkadotjs-icon.svg' ?>">
-		</a>
-		`);
-                        toggleModalFooter(false);
-                        $('#web3vn-waco-modal-lg-wallet').modal('show');
-                    }
-
-                    function showPicker(accounts) {
-                        $('#web3vn-waco-confirm-selected').prop('disabled', true);
-                        let selector = $('#web3vn-waco-account-wallet');
-                        selector.html('');
-                        let str = ``;
-                        if (accounts.length) {
-                            for (let i = 0; i < accounts.length; i++) {
-                                let optn = accounts[i].address;
-                                let name = accounts[i].meta.name;
-                                str += '<p><label><input type="radio" name="select_wallet" data-name="' + name + '" value="' + optn + '" /> <b>' + name + ':</b> ' + optn + '</label></p>';
-                            }
-                            selector.html(str);
-                            toggleModalFooter(true);
-                        } else {
-                            str = `<p style="margin-top: 0">There is no account to show.</p>`
-                            selector.html(str);
-                        }
-                        $('#web3vn-waco-modal-lg-wallet').modal('show');
-                    }
-
                     $(document).ready(function () {
-                        checkAccountThenShowInfo();
-                        document.querySelector("#web3vn-waco-connectW").addEventListener('click', selectWallet);
-                        document.querySelector("#web3vn-waco-confirm-selected").addEventListener('click', confirmSelectedWallet);
+                        const $selectWalletBtn = $('#web3vn-waco-connectW');
 
-                        $('#web3vn-waco-account-wallet').on('change', 'input[name=select_wallet]', function () {
-                            $('#web3vn-waco-confirm-selected').prop('disabled', false);
+                        $.ajax({
+                            url: polkadotScriptUrl,
+                            dataType: 'script',
+                            cache: true, // or get new, fresh copy on every page load
+                            success: function() {
+                                WalletSelectionModalHelperFunc = web3vnWacoWalletSelectionModalHelper($, polkadotIconUrl);
+
+                                $selectWalletBtn.on('click', WalletSelectionModalHelperFunc.selectWallet);
+                                $(WalletSelectionModalHelperFunc.S_CONFIRM_BTN).on('click', confirmSelectedWallet);
+                                WalletSelectionModalHelperFunc.registerOnSelectAddress();
+
+                                $selectWalletBtn.removeClass('waco-h-hidden');
+                            }
                         })
+
+                        checkAccountThenShowInfo();
                     });
                 })(jQuery);
             </script>
